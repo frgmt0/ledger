@@ -25,15 +25,19 @@ DEFAULT_CATEGORIES = [
 
 
 def initialize_default_categories(db: Session):
-    """Initialize the database with default categories if empty."""
+    """Initialize the database with default categories."""
     from .models import Category
     
-    existing_categories = db.query(Category).count()
-    if existing_categories == 0:
-        for category_name in DEFAULT_CATEGORIES:
+    # Get existing category names
+    existing = {c.name for c in db.query(Category).all()}
+    
+    # Add any missing default categories
+    for category_name in DEFAULT_CATEGORIES:
+        if category_name not in existing:
             category = Category(name=category_name)
             db.add(category)
-        db.commit()
+    
+    db.commit()
 
 
 @contextmanager
@@ -111,17 +115,12 @@ def migrate_database():
 
 def initialize_database():
     """Initialize database schema and defaults if database doesn't exist."""
-    # Check if database already exists by checking for tables
-    inspector = inspect(engine)
-    existing_tables = inspector.get_table_names()
+    # Create tables if they don't exist
+    Base.metadata.create_all(engine)
     
-    if not existing_tables:
-        # Only create tables if database is empty
-        Base.metadata.create_all(engine)
-        
-        # Initialize defaults
-        with get_db() as db:
-            initialize_default_categories(db)
+    # Initialize defaults
+    with get_db() as db:
+        initialize_default_categories(db)
     else:
         # Database exists, just ensure schema is up to date
         # For now, this does nothing, but will be used for migrations
