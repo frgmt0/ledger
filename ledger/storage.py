@@ -4,9 +4,10 @@ Database storage operations for the ledger application.
 from contextlib import contextmanager
 from datetime import datetime
 from decimal import Decimal
+from pathlib import Path
 from typing import Generator, List, Optional
 
-from sqlalchemy import create_engine, select
+from sqlalchemy import create_engine, select, inspect
 from sqlalchemy.orm import Session
 
 from .config import DATABASE_URL
@@ -80,20 +81,53 @@ def delete_category(db: Session, name: str) -> bool:
         return True
     return False
 
+def backup_database():
+    """Create a backup of the database file."""
+    from datetime import datetime
+    import shutil
+    
+    backup_dir = Path(DB_PATH).parent / "backups"
+    backup_dir.mkdir(exist_ok=True)
+    
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    backup_path = backup_dir / f"ledger_backup_{timestamp}.db"
+    
+    # Copy the database file
+    shutil.copy2(DB_PATH, backup_path)
+    return backup_path
+
+def migrate_database():
+    """
+    Placeholder for future database migrations.
+    This will be implemented when schema changes are needed.
+    """
+    # First, create a backup
+    backup_path = backup_database()
+    print(f"Database backed up to: {backup_path}")
+    
+    # In the future, migration code will go here
+    pass
+
 def initialize_database():
-    """Initialize database schema and defaults."""
-    # Drop all tables
-    Base.metadata.drop_all(engine)
+    """Initialize database schema and defaults if database doesn't exist."""
+    # Check if database already exists by checking for tables
+    inspector = inspect(engine)
+    existing_tables = inspector.get_table_names()
     
-    # Create all tables
-    Base.metadata.create_all(engine)
-    
-    # Initialize defaults
-    with get_db() as db:
-        initialize_default_categories(db)
+    if not existing_tables:
+        # Only create tables if database is empty
+        Base.metadata.create_all(engine)
+        
+        # Initialize defaults
+        with get_db() as db:
+            initialize_default_categories(db)
+    else:
+        # Database exists, just ensure schema is up to date
+        # For now, this does nothing, but will be used for migrations
+        pass
 
 # Initialize database on module import
-initialize_database()
+initialize_database()  # Now safe to run on existing database
 
 def create_bank_account(
     db: Session,
