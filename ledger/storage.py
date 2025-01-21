@@ -33,6 +33,7 @@ def get_db() -> Generator[Session, None, None]:
 
 
 def create_transaction(
+    db: Session,
     date: datetime,
     description: str,
     amount: Decimal,
@@ -48,10 +49,9 @@ def create_transaction(
         notes=notes,
     )
     
-    with get_db() as db:
-        db.add(transaction)
-        db.commit()
-        db.refresh(transaction)
+    db.add(transaction)
+    db.commit()
+    db.refresh(transaction)
     
     return transaction
 
