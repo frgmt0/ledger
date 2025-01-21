@@ -1,77 +1,77 @@
-# Ledger - A Personal CLI Finance Tool
+# ledger: the cli finance tool that's trying its best :>
 
-A simple but powerful command-line ledger system for tracking personal finances with an easy input interface.
+hey! this is ledger, a command-line tool for tracking your money without the drama. it's simple, it works, and it won't judge you for buying that third coffee today.
 
-## Features
+## what even is this?
 
-- Transaction recording with amount, category, date, and description
-- Transaction querying and filtering
-- Monthly/yearly financial summaries
-- Category-based analysis
-- Data export capabilities
+it's a **personal finance tracker** that:
+• handles your transactions without making you hate spreadsheets
+• gives you insights about where your money goes (*spoiler: probably coffee*)
+• keeps things simple while still being actually useful
 
-## Installation
+oh, and it's built in Python because sometimes the classics just work™.
 
-Requires Python 3.8+
-
-### Global Installation
-```bash
-./install.sh
-```
-
-This will install the `ledger` command globally on your system.
-
-### Development Installation
-For development in a virtual environment:
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -e ".[dev]"
-```
-
-## Usage
-
-Basic commands:
+## current status: making money moves
 
 ```bash
-# Add a transaction
-ledger add 42.50 --category food --description "Groceries"
+# add some damage to your wallet
+ledger add 42.50 --category food --description "groceries (mostly snacks tbh)"
 
-# List transactions
+# see where all your money went
 ledger list --category food --start-date 2024-01-01
 
-# View summary
+# face the monthly truth
 ledger summary --period monthly
 
-# Manage categories
+# pretend to be organized with categories
 ledger categories list
 ledger categories add food
-ledger categories remove food
+ledger categories remove food  # when you give up on cooking
 
-# Export data
+# export data (for your tax person who definitely judges your spending)
 ledger export --format csv
 ```
 
-## Development
+## getting this thing running
 
-This project follows:
-- PEP 8 style guide
-- Type hints throughout
-- Comprehensive docstrings
-- Test-driven development
+you'll need Python 3.8+ (*because we're not savages*).
 
-### Running Tests
-
+### the easy way:
 ```bash
-pytest
+./install.sh  # magic happens here
+```
+now you've got `ledger` available everywhere. *congratulations on adulting!*
+
+### the dev way:
+for when you want to mess with the code:
+```bash
+python3 -m venv .venv
+source .venv/activate
+pip install -e ".[dev]"  # the square brackets are important, trust me
 ```
 
-### Type Checking
+## dev stuff (for the brave)
 
+if you're helping out (*thank you!*), here's what you need to know:
+- we follow PEP 8 (*mostly*)
+- type hints everywhere (*because TypeError is not a fun surprise*)
+- actual docstrings (*future you will thank us*)
+- tests that test things (*revolutionary, i know*)
+
+### testing things:
 ```bash
-mypy finance_cli
+pytest  # pray to the test gods
 ```
 
-## License
+### type checking:
+```bash
+mypy finance_cli  # watch for angry red squiggles
+```
 
-MIT License
+## license
+
+MIT License (*because sharing is caring*)
+
+this readme was written while tracking expenses that definitely could have been avoided. *probably*. :>
+
+happy tracking! >:>
