@@ -13,7 +13,7 @@ from colorama import init, Fore, Style
 from .storage import (
     get_db, create_transaction, get_transactions,
     get_or_create_category, delete_category,
-    get_bank_accounts
+    get_bank_accounts, create_bank_account
 )
 from .models import Category
 
@@ -28,6 +28,7 @@ def interactive_menu():
         Choice("Add Transaction", "add"),
         Choice("List Transactions", "list"),
         Choice("View Categories", "categories"),
+        Choice("Manage Bank Accounts", "accounts"),
         Choice("Exit", "exit")
     ]
     
@@ -45,6 +46,8 @@ def interactive_menu():
             interactive_list()
         elif action == "categories":
             show_categories()
+        elif action == "accounts":
+            manage_bank_accounts()
 
 def interactive_add():
     """Interactive transaction addition."""
@@ -166,6 +169,56 @@ def interactive_list():
     
     except Exception as e:
         typer.echo(f"{Fore.RED}Error listing transactions: {str(e)}{Style.RESET_ALL}")
+
+def manage_bank_accounts():
+    """Manage bank accounts."""
+    try:
+        with get_db() as db:
+            accounts = get_bank_accounts(db)
+            
+            typer.echo(f"{Fore.BLUE}Current Bank Accounts:{Style.RESET_ALL}")
+            if accounts:
+                for acc in accounts:
+                    typer.echo(f"  - {acc.name} ({acc.account_type})")
+            else:
+                typer.echo("  No bank accounts configured yet")
+            
+            action = questionary.select(
+                "Bank account management:",
+                choices=[
+                    Choice("Add new account", "add"),
+                    Choice("Back", "back")
+                ]
+            ).ask()
+            
+            if action == "add":
+                name = questionary.text(
+                    "Enter account name:",
+                    validate=lambda x: len(x) > 0
+                ).ask()
+                
+                account_type = questionary.select(
+                    "Select account type:",
+                    choices=["Checking", "Savings", "Credit Card", "Investment"]
+                ).ask()
+                
+                description = questionary.text(
+                    "Enter description (optional):"
+                ).ask()
+                
+                account = create_bank_account(
+                    db,
+                    name=name,
+                    account_type=account_type,
+                    description=description if description else None
+                )
+                
+                typer.echo(
+                    f"{Fore.GREEN}Bank account '{account.name}' created!{Style.RESET_ALL}"
+                )
+    
+    except Exception as e:
+        typer.echo(f"{Fore.RED}Error managing bank accounts: {str(e)}{Style.RESET_ALL}")
 
 def show_categories():
     """Display available categories and allow management."""
