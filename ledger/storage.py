@@ -127,8 +127,6 @@ def initialize_database():
         # For now, this does nothing, but will be used for migrations
         pass
 
-# Initialize database on module import
-initialize_database()  # Now safe to run on existing database
 
 def create_bank_account(
     db: Session,
