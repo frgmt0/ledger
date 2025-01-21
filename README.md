@@ -14,12 +14,18 @@ A simple but powerful command-line ledger system for tracking personal finances 
 
 Requires Python 3.8+
 
+### Global Installation
 ```bash
-pip install .
+./install.sh
 ```
 
-For development:
+This will install the `ledger` command globally on your system.
+
+### Development Installation
+For development in a virtual environment:
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 

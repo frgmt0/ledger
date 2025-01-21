@@ -1,26 +1,14 @@
 #!/bin/zsh
 
-echo "Installing Ledger CLI..."
+echo "Installing Ledger CLI globally..."
 
-# Create virtual environment if it doesn't exist
-if [ ! -d ".venv" ]; then
-    echo "Creating virtual environment..."
-    python3 -m venv .venv
-fi
-
-# Activate virtual environment
-source .venv/bin/activate
-
-# Install dependencies
+# Install package globally
 echo "Installing dependencies..."
-pip install -e ".[dev]"
+pip3 install -e ".[dev]"
 
 # Initialize database
 echo "Initializing database..."
 alembic upgrade head
 
-# Make the CLI executable
-chmod +x .venv/bin/ledger
-
-echo "Installation complete! You can now run 'ledger' command."
+echo "Installation complete! You can now run 'ledger' command from anywhere."
 echo "To get started, run: ledger"
