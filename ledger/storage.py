@@ -32,6 +32,20 @@ def get_db() -> Generator[Session, None, None]:
         session.close()
 
 
+def get_or_create_category(db: Session, name: str) -> str:
+    """Get existing category or create new one."""
+    from .models import Category
+    
+    # Check if category exists
+    category = db.query(Category).filter(Category.name == name).first()
+    if not category:
+        # Create new category
+        category = Category(name=name)
+        db.add(category)
+        db.commit()
+    
+    return category.name
+
 def create_transaction(
     db: Session,
     date: datetime,
@@ -40,6 +54,11 @@ def create_transaction(
     category: Optional[str] = None,
 ) -> Transaction:
     """Create a new transaction."""
+    # Create/get category if provided
+    if category:
+        category = get_or_create_category(db, category)
+    
+    # Create transaction
     transaction = Transaction(
         date=date,
         description=description,
@@ -49,9 +68,9 @@ def create_transaction(
     
     db.add(transaction)
     db.commit()
+    db.refresh(transaction)
     
-    # Get a fresh copy of the transaction from the database
-    return db.get(Transaction, transaction.id)
+    return transaction
 
 
 def get_transactions(

@@ -146,9 +146,19 @@ def interactive_list():
 
 def show_categories():
     """Display available categories."""
-    typer.echo(f"{Fore.BLUE}Available Categories:{Style.RESET_ALL}")
-    for category in Category:
-        typer.echo(f"  - {category.value}")
+    try:
+        with get_db() as db:
+            from .models import Category
+            categories = db.query(Category).order_by(Category.name).all()
+            
+            typer.echo(f"{Fore.BLUE}Available Categories:{Style.RESET_ALL}")
+            if categories:
+                for category in categories:
+                    typer.echo(f"  - {category.name}")
+            else:
+                typer.echo("  No categories defined yet")
+    except Exception as e:
+        typer.echo(f"{Fore.RED}Error listing categories: {str(e)}{Style.RESET_ALL}")
 
 @app.callback(invoke_without_command=True)
 def main(ctx: typer.Context):
