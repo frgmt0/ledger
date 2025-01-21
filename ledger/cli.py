@@ -283,7 +283,11 @@ def show_categories():
     try:
         with get_db() as db:
             from .models import Category
-            from .storage import DEFAULT_CATEGORIES
+            from .storage import DEFAULT_CATEGORIES, initialize_database
+            
+            # Ensure database and default categories are initialized
+            initialize_database()
+            
             categories = db.query(Category).order_by(Category.name).all()
             
             typer.echo(f"{Fore.BLUE}Available Categories:{Style.RESET_ALL}")
