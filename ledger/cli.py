@@ -10,7 +10,10 @@ from questionary import Choice
 import typer
 from colorama import init, Fore, Style
 
-from .storage import get_db, create_transaction, get_transactions
+from .storage import (
+    get_db, create_transaction, get_transactions,
+    get_or_create_category, delete_category
+)
 from .categories import Category
 
 # Initialize colorama

@@ -21,22 +21,6 @@ DEFAULT_CATEGORIES = [
     "Education", "Income", "Other"
 ]
 
-def initialize_default_categories(db: Session):
-    """Initialize the database with default categories if empty."""
-    from .models import Category
-    
-    existing_categories = db.query(Category).count()
-    if existing_categories == 0:
-        for category_name in DEFAULT_CATEGORIES:
-            category = Category(name=category_name)
-            db.add(category)
-        db.commit()
-
-# Create all tables and initialize defaults
-Base.metadata.create_all(engine)
-with get_db() as db:
-    initialize_default_categories(db)
-
 
 @contextmanager
 def get_db() -> Generator[Session, None, None]:
@@ -83,6 +67,11 @@ def delete_category(db: Session, name: str) -> bool:
         db.commit()
         return True
     return False
+
+# Create all tables and initialize defaults
+Base.metadata.create_all(engine)
+with get_db() as db:
+    initialize_default_categories(db)
 
 def create_transaction(
     db: Session,
