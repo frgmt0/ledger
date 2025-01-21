@@ -51,9 +51,9 @@ def create_transaction(
     
     db.add(transaction)
     db.commit()
-    db.refresh(transaction)
     
-    return transaction
+    # Get a fresh copy of the transaction from the database
+    return db.get(Transaction, transaction.id)
 
 
 def get_transactions(
