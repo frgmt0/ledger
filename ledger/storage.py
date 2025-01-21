@@ -22,6 +22,18 @@ DEFAULT_CATEGORIES = [
 ]
 
 
+def initialize_default_categories(db: Session):
+    """Initialize the database with default categories if empty."""
+    from .models import Category
+    
+    existing_categories = db.query(Category).count()
+    if existing_categories == 0:
+        for category_name in DEFAULT_CATEGORIES:
+            category = Category(name=category_name)
+            db.add(category)
+        db.commit()
+
+
 @contextmanager
 def get_db() -> Generator[Session, None, None]:
     """Get a database session."""
