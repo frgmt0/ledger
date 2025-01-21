@@ -41,4 +41,4 @@ warn_return_any = true
 warn_unused_configs = true
 
 [project.scripts]
-ledger = "finance_cli.cli:app"
+ledger = "ledger.cli:app"
