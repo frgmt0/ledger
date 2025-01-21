@@ -91,10 +91,15 @@ def interactive_add():
         # Show category selection with existing categories
         with get_db() as db:
             categories = [c.name for c in db.query(Category).all()]
+            choices = [Choice(c, c) for c in categories]
+            choices.append(Choice("Add new category", "new"))
+            
         category = questionary.select(
             "Select category:",
-            choices=categories + ["Add new category"]
+            choices=choices
         ).ask()
+        
+        if category == "new":
         
         if category == "Add new category":
             new_category = questionary.text(

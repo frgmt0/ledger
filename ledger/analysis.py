@@ -105,7 +105,8 @@ def print_financial_report(
         console.print(f"From: {start_date.strftime('%Y-%m-%d')}")
     if end_date:
         console.print(f"To: {end_date.strftime('%Y-%m-%d')}")
-    console.print(f"\nCurrent Balance: [{'green' if balance >= 0 else 'red'}]${abs(balance):,.2f}[/]")
+    sign = "" if balance >= 0 else "-"
+    console.print(f"\nCurrent Balance: [{'green' if balance >= 0 else 'red'}]{sign}${abs(balance):,.2f}[/]")
     
     # Print income summary
     console.print("\n[bold green]Income Summary:[/bold green]")
