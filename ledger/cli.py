@@ -90,8 +90,13 @@ def interactive_add():
         
         # Show category selection with existing categories
         with get_db() as db:
+            # Initialize default categories if needed
+            from .storage import initialize_default_categories
+            initialize_default_categories(db)
+            
+            # Get all categories
             categories = [c.name for c in db.query(Category).all()]
-            choices = [Choice(c, c) for c in categories]
+            choices = [Choice(c, c) for c in sorted(categories)]
             choices.append(Choice("Add new category", "new"))
             
         category = questionary.select(
