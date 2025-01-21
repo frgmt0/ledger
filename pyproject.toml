@@ -2,6 +2,9 @@
 name = "ledger"
 version = "0.1.0"
 description = "A Personal CLI Finance Tool"
+
+[tool.hatch.build.targets.wheel]
+packages = ["ledger"]
 readme = "README.md"
 requires-python = ">=3.8"
 authors = [
