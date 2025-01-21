@@ -121,10 +121,6 @@ def initialize_database():
     # Initialize defaults
     with get_db() as db:
         initialize_default_categories(db)
-    else:
-        # Database exists, just ensure schema is up to date
-        # For now, this does nothing, but will be used for migrations
-        pass
 
 
 def create_bank_account(
