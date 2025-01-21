@@ -12,7 +12,8 @@ from colorama import init, Fore, Style
 
 from .storage import (
     get_db, create_transaction, get_transactions,
-    get_or_create_category, delete_category
+    get_or_create_category, delete_category,
+    get_bank_accounts
 )
 from .models import Category
 
