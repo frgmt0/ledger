@@ -100,14 +100,11 @@ def interactive_add():
         ).ask()
         
         if category == "new":
-        
-        if category == "Add new category":
             new_category = questionary.text(
                 "Enter new category name:",
                 validate=lambda x: len(x) > 0
             ).ask()
             if questionary.confirm(f"Add '{new_category}' as a new category?").ask():
-                # In a real implementation, you would add this to the Category enum
                 category = new_category
         
         # Create the transaction
