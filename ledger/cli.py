@@ -339,13 +339,13 @@ def main(ctx: typer.Context):
 
 @app.command()
 def add(
+    amount: float = typer.Argument(..., help="Transaction amount"),
+    description: str = typer.Option(..., help="Transaction description"),
+    category: Optional[str] = typer.Option(None, help="Transaction category"),
     date: str = typer.Option(
         datetime.now().strftime("%Y-%m-%d"),
         help="Transaction date (YYYY-MM-DD)",
     ),
-    description: str = typer.Option(..., help="Transaction description"),
-    amount: float = typer.Option(..., help="Transaction amount"),
-    category: Optional[str] = typer.Option(None, help="Transaction category"),
 ):
     """Add a new transaction."""
     try:
