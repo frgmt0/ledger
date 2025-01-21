@@ -10,7 +10,7 @@ from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 
 from .config import DATABASE_URL
-from .models import Base, Transaction
+from .models import Base, Transaction, BankAccount
 
 engine = create_engine(DATABASE_URL)
 
@@ -85,11 +85,39 @@ Base.metadata.create_all(engine)
 with get_db() as db:
     initialize_default_categories(db)
 
+def create_bank_account(
+    db: Session,
+    name: str,
+    account_type: str,
+    description: Optional[str] = None,
+) -> BankAccount:
+    """Create a new bank account."""
+    account = BankAccount(
+        name=name,
+        account_type=account_type,
+        description=description,
+    )
+    
+    db.add(account)
+    db.commit()
+    db.refresh(account)
+    
+    return account
+
+def get_bank_accounts(db: Session) -> List[BankAccount]:
+    """Get all bank accounts."""
+    return list(db.query(BankAccount).all())
+
+def get_bank_account(db: Session, account_id: int) -> Optional[BankAccount]:
+    """Get a specific bank account by ID."""
+    return db.query(BankAccount).filter(BankAccount.id == account_id).first()
+
 def create_transaction(
     db: Session,
     date: datetime,
     description: str,
     amount: Decimal,
+    account_id: int,
     category: Optional[str] = None,
 ) -> Transaction:
     """Create a new transaction."""
@@ -103,6 +131,7 @@ def create_transaction(
         description=description,
         amount=amount,
         category=category,
+        account_id=account_id,
     )
     
     db.add(transaction)
@@ -117,6 +146,7 @@ def get_transactions(
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,
     category: Optional[str] = None,
+    account_id: Optional[int] = None,
 ) -> List[Transaction]:
     """Get transactions with optional filtering."""
     query = select(Transaction)
@@ -127,5 +157,7 @@ def get_transactions(
         query = query.where(Transaction.date <= end_date)
     if category:
         query = query.where(Transaction.category == category)
+    if account_id:
+        query = query.where(Transaction.account_id == account_id)
     
     return list(db.scalars(query))
