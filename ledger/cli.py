@@ -161,10 +161,10 @@ def show_categories():
             if categories:
                 for category in categories:
                     is_default = category.name in DEFAULT_CATEGORIES
-                    typer.echo(
-                        f"  - {category.name} "
-                        f"{Fore.YELLOW}(default){Style.RESET_ALL}" if is_default else ""
-                    )
+                    category_text = f"  - {category.name}"
+                    if is_default:
+                        category_text += f" {Fore.YELLOW}(default){Style.RESET_ALL}"
+                    typer.echo(category_text)
             else:
                 typer.echo("  No categories defined yet")
             
