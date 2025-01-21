@@ -80,10 +80,20 @@ def delete_category(db: Session, name: str) -> bool:
         return True
     return False
 
-# Create all tables and initialize defaults
-Base.metadata.create_all(engine)
-with get_db() as db:
-    initialize_default_categories(db)
+def initialize_database():
+    """Initialize database schema and defaults."""
+    # Drop all tables
+    Base.metadata.drop_all(engine)
+    
+    # Create all tables
+    Base.metadata.create_all(engine)
+    
+    # Initialize defaults
+    with get_db() as db:
+        initialize_default_categories(db)
+
+# Initialize database on module import
+initialize_database()
 
 def create_bank_account(
     db: Session,
