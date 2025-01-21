@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Generator, List, Optional
 
 from sqlalchemy import create_engine, select, inspect
+from .config import DB_PATH
 from sqlalchemy.orm import Session
 
 from .config import DATABASE_URL
