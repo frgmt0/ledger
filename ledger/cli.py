@@ -48,6 +48,22 @@ def interactive_menu():
 def interactive_add():
     """Interactive transaction addition."""
     try:
+        # First, select a bank account
+        with get_db() as db:
+            accounts = get_bank_accounts(db)
+            if not accounts:
+                typer.echo(f"{Fore.RED}No bank accounts found. Please create one first.{Style.RESET_ALL}")
+                return
+            
+            account_choices = [
+                Choice(f"{acc.name} ({acc.account_type})", acc.id)
+                for acc in accounts
+            ]
+            account_id = questionary.select(
+                "Select bank account:",
+                choices=account_choices
+            ).ask()
+            
         # Get transaction details interactively
         date_str = questionary.text(
             "Enter date (YYYY-MM-DD):",
@@ -89,6 +105,7 @@ def interactive_add():
                 description=description,
                 amount=Decimal(amount),
                 category=category,
+                account_id=account_id,
             )
             
         typer.echo(
