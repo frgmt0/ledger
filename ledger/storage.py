@@ -38,7 +38,6 @@ def create_transaction(
     description: str,
     amount: Decimal,
     category: Optional[str] = None,
-    notes: Optional[str] = None,
 ) -> Transaction:
     """Create a new transaction."""
     transaction = Transaction(
@@ -46,7 +45,6 @@ def create_transaction(
         description=description,
         amount=amount,
         category=category,
-        notes=notes,
     )
     
     db.add(transaction)

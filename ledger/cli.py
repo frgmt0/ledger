@@ -77,8 +77,6 @@ def interactive_add():
                 # In a real implementation, you would add this to the Category enum
                 category = new_category
         
-        notes = questionary.text("Enter notes (optional):").ask()
-        
         # Create the transaction
         with get_db() as db:
             transaction = create_transaction(
@@ -87,7 +85,6 @@ def interactive_add():
                 description=description,
                 amount=Decimal(amount),
                 category=category,
-                notes=notes,
             )
             
         typer.echo(
@@ -168,7 +165,6 @@ def add(
     description: str = typer.Option(..., help="Transaction description"),
     amount: float = typer.Option(..., help="Transaction amount"),
     category: Optional[str] = typer.Option(None, help="Transaction category"),
-    notes: Optional[str] = typer.Option(None, help="Additional notes"),
 ):
     """Add a new transaction."""
     try:
@@ -179,7 +175,6 @@ def add(
                 description=description,
                 amount=Decimal(str(amount)),
                 category=category,
-                notes=notes,
             )
             typer.echo(
                 f"{Fore.GREEN}Transaction added successfully: "

@@ -22,7 +22,6 @@ class Transaction(Base):
     description: Mapped[str] = mapped_column(String(200), nullable=False)
     amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     category: Mapped[Optional[str]] = mapped_column(String(50))
-    notes: Mapped[Optional[str]] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.utcnow
     )
