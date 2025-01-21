@@ -145,20 +145,64 @@ def interactive_list():
         typer.echo(f"{Fore.RED}Error listing transactions: {str(e)}{Style.RESET_ALL}")
 
 def show_categories():
-    """Display available categories."""
+    """Display available categories and allow management."""
     try:
         with get_db() as db:
             from .models import Category
+            from .storage import DEFAULT_CATEGORIES
             categories = db.query(Category).order_by(Category.name).all()
             
             typer.echo(f"{Fore.BLUE}Available Categories:{Style.RESET_ALL}")
             if categories:
                 for category in categories:
-                    typer.echo(f"  - {category.name}")
+                    is_default = category.name in DEFAULT_CATEGORIES
+                    typer.echo(
+                        f"  - {category.name} "
+                        f"{Fore.YELLOW}(default){Style.RESET_ALL}" if is_default else ""
+                    )
             else:
                 typer.echo("  No categories defined yet")
+            
+            # Category management options
+            action = questionary.select(
+                "Category management:",
+                choices=[
+                    Choice("Add new category", "add"),
+                    Choice("Delete custom category", "delete"),
+                    Choice("Back", "back")
+                ]
+            ).ask()
+            
+            if action == "add":
+                new_category = questionary.text(
+                    "Enter new category name:",
+                    validate=lambda x: len(x) > 0
+                ).ask()
+                get_or_create_category(db, new_category)
+                typer.echo(f"{Fore.GREEN}Category '{new_category}' added!{Style.RESET_ALL}")
+            
+            elif action == "delete":
+                custom_categories = [
+                    c.name for c in categories 
+                    if c.name not in DEFAULT_CATEGORIES
+                ]
+                if not custom_categories:
+                    typer.echo(f"{Fore.YELLOW}No custom categories to delete{Style.RESET_ALL}")
+                    return
+                
+                to_delete = questionary.select(
+                    "Select category to delete:",
+                    choices=custom_categories + ["Cancel"]
+                ).ask()
+                
+                if to_delete != "Cancel":
+                    if delete_category(db, to_delete):
+                        typer.echo(f"{Fore.GREEN}Category '{to_delete}' deleted!{Style.RESET_ALL}")
+                    else:
+                        typer.echo(f"{Fore.RED}Could not delete category{Style.RESET_ALL}")
+                        
     except Exception as e:
-        typer.echo(f"{Fore.RED}Error listing categories: {str(e)}{Style.RESET_ALL}")
+        typer.echo(f"{Fore.RED}Error managing categories: {str(e)}{Style.RESET_ALL}")
 
 @app.callback(invoke_without_command=True)
 def main(ctx: typer.Context):

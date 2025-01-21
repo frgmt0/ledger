@@ -14,8 +14,28 @@ from .models import Base, Transaction
 
 engine = create_engine(DATABASE_URL)
 
-# Create all tables
+# Default categories to populate the database with
+DEFAULT_CATEGORIES = [
+    "Food", "Housing", "Transportation", "Utilities",
+    "Healthcare", "Entertainment", "Shopping",
+    "Education", "Income", "Other"
+]
+
+def initialize_default_categories(db: Session):
+    """Initialize the database with default categories if empty."""
+    from .models import Category
+    
+    existing_categories = db.query(Category).count()
+    if existing_categories == 0:
+        for category_name in DEFAULT_CATEGORIES:
+            category = Category(name=category_name)
+            db.add(category)
+        db.commit()
+
+# Create all tables and initialize defaults
 Base.metadata.create_all(engine)
+with get_db() as db:
+    initialize_default_categories(db)
 
 
 @contextmanager
@@ -45,6 +65,24 @@ def get_or_create_category(db: Session, name: str) -> str:
         db.commit()
     
     return category.name
+
+def delete_category(db: Session, name: str) -> bool:
+    """Delete a category if it's not a default one.
+    
+    Returns:
+        bool: True if category was deleted, False if it was a default category
+    """
+    from .models import Category
+    
+    if name in DEFAULT_CATEGORIES:
+        return False
+        
+    category = db.query(Category).filter(Category.name == name).first()
+    if category:
+        db.delete(category)
+        db.commit()
+        return True
+    return False
 
 def create_transaction(
     db: Session,
