@@ -15,6 +15,7 @@ from .storage import (
     get_or_create_category, delete_category,
     get_bank_accounts, create_bank_account
 )
+from .analysis import print_financial_report
 from .models import Category
 
 # Initialize colorama
@@ -29,6 +30,7 @@ def interactive_menu():
         Choice("List Transactions", "list"),
         Choice("View Categories", "categories"),
         Choice("Manage Bank Accounts", "accounts"),
+        Choice("Analysis", "analysis"),
         Choice("Exit", "exit")
     ]
     
@@ -48,6 +50,8 @@ def interactive_menu():
             show_categories()
         elif action == "accounts":
             manage_bank_accounts()
+        elif action == "analysis":
+            show_analysis()
 
 def interactive_add():
     """Interactive transaction addition."""
@@ -219,6 +223,53 @@ def manage_bank_accounts():
     
     except Exception as e:
         typer.echo(f"{Fore.RED}Error managing bank accounts: {str(e)}{Style.RESET_ALL}")
+
+def show_analysis():
+    """Show financial analysis and reports."""
+    try:
+        with get_db() as db:
+            # Get filter preferences
+            account_id = None
+            if questionary.confirm("Filter by specific account?").ask():
+                accounts = get_bank_accounts(db)
+                if not accounts:
+                    typer.echo(f"{Fore.RED}No bank accounts found.{Style.RESET_ALL}")
+                    return
+                
+                account_choices = [
+                    Choice(f"{acc.name} ({acc.account_type})", acc.id)
+                    for acc in accounts
+                ]
+                account_choices.append(Choice("All Accounts", None))
+                account_id = questionary.select(
+                    "Select account:",
+                    choices=account_choices
+                ).ask()
+            
+            # Get date range
+            start_date = None
+            end_date = None
+            if questionary.confirm("Filter by date range?").ask():
+                start_date = questionary.text(
+                    "Enter start date (YYYY-MM-DD):",
+                    validate=lambda x: len(x) == 0 or len(x) == 10
+                ).ask()
+                end_date = questionary.text(
+                    "Enter end date (YYYY-MM-DD):",
+                    validate=lambda x: len(x) == 0 or len(x) == 10
+                ).ask()
+            
+            # Convert dates if provided
+            if start_date:
+                start_date = datetime.strptime(start_date, "%Y-%m-%d")
+            if end_date:
+                end_date = datetime.strptime(end_date, "%Y-%m-%d")
+            
+            # Generate and print report
+            print_financial_report(db, start_date, end_date, account_id)
+    
+    except Exception as e:
+        typer.echo(f"{Fore.RED}Error generating analysis: {str(e)}{Style.RESET_ALL}")
 
 def show_categories():
     """Display available categories and allow management."""
