@@ -14,7 +14,7 @@ from .storage import (
     get_db, create_transaction, get_transactions,
     get_or_create_category, delete_category
 )
-from .categories import Category
+from .models import Category
 
 # Initialize colorama
 init()
@@ -65,7 +65,8 @@ def interactive_add():
         ).ask()
         
         # Show category selection with existing categories
-        categories = [c.value for c in Category]
+        with get_db() as db:
+            categories = [c.name for c in db.query(Category).all()]
         category = questionary.select(
             "Select category:",
             choices=categories + ["Add new category"]
@@ -117,7 +118,8 @@ def interactive_list():
                 ).ask()
             
             if questionary.confirm("Filter by category?").ask():
-                categories = [c.value for c in Category]
+                with get_db() as db:
+                    categories = [c.name for c in db.query(Category).all()]
                 category = questionary.select(
                     "Select category:",
                     choices=categories
